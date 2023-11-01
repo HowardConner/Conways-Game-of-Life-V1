@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Game Engine Refs">
+      <UniqueIdentifier>{a844d25e-75ad-475c-9fb3-5e1643baa842}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine Source Files">
+      <UniqueIdentifier>{f8d1db74-941e-448c-b452-20c994bc5915}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="commentTemplate.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="commentTemplateAttribute.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="commentTemplateClass.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Game-Engine\Debug Functions\DataLogReport.cpp">
+      <Filter>Source Files\Engine Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Game-Engine\Renderer\RenderEngine.cpp">
+      <Filter>Source Files\Engine Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Game-Engine\Interface Classes\vCameraInterface.cpp">
+      <Filter>Source Files\Engine Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Game-Engine\Interface Classes\vDragInterface.cpp">
+      <Filter>Source Files\Engine Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BoolBoard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConwaySolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Game-Engine\InputHandler\InputController.cpp">
+      <Filter>Source Files\Engine Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RectDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Game-Engine\InputHandler\InputOverloader.cpp">
+      <Filter>Source Files\Engine Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Game-Engine\Interface Classes\vInputInterface.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\Data Structures\Array_Grid.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\Debug Functions\DataLogReport.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\Component Classes\Drawable_Visual.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\GameEngine.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\InputHandler\InputController.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\Component Classes\Object_Attributes.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\Component Classes\Object_Flags.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\Debug Functions\PrintColors.h">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\Renderer\RenderEngine.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\Renderer\RenderObject.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\Interface Classes\vCameraInterface.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\Interface Classes\vDragInterface.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\Interface Classes\vDrawableInterface.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\Interface Classes\vEventInterface.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="MasterHeader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraController.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BoolBoard.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cell.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IntesectionFunctions.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConwaySolver.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConwaySettings.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector_Grid.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RectDisplay.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vUpdateInterface.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\Interface Classes\vUpdateInterface.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\InputHandler\InputOverloader.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadsUpDisplay.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
