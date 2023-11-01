@@ -32,9 +32,22 @@ enum class InputEvent
 	SaveData		= 1 << 10,
 	LoadSaveData	= 1 << 11,
 	CursorMovement	= 1 << 12,
-	//Flag14 = 1 << 13,
-	//Flag15 = 1 << 14,
-	//Flag16 = 1 << 15
+	RMBClick		= 1 << 13,
+	LMBClick		= 1 << 14,
+	//Flag16= 1 << 15,
+	//Flag17= 1 << 16,
+	//Flag18= 1 << 17,
+	//Flag19= 1 << 18,
+	//Flag20= 1 << 19,
+	//Flag21= 1 << 20,
+	//Flag22= 1 << 21,
+	//Flag23= 1 << 22,
+	//Flag24= 1 << 23,
+	//Flag25= 1 << 24,
+	//Flag26= 1 << 25,
+	//Flag27= 1 << 26,
+	//Flag28= 1 << 27,
+	//Flag29= 1 << 28,
 };
 
 struct ProgramBindings {
@@ -71,7 +84,7 @@ int main()
 	sf::RectangleShape shape(sf::Vector2f(100, 100));
 	sf::Vector2f simStateScreenPercent(0.1, 0.1);
 	sf::Image tempImage;
-	Flag_16<InputEvent> ProgramEvent;
+	Flag_32<InputEvent> ProgramEvent;
 
 	sf::Texture simActiveTexture;
 	tempImage.create(200, 200, sf::Color::Green);
@@ -88,37 +101,37 @@ int main()
 
 	CameraController camera(window, 0.025);
 	CameraController hud(window, 0.025);
-	BoolBoard world(64, 64, 50);
+	BoolBoard lifeBoard(64, 64, 50);
 	ConwaySettings cwaySettings;
 
-	//world.overrideCellState( 0, 0, LifeState::ALIVE);
-	//world.overrideCellState( 1, 0, LifeState::ALIVE);
-	//world.overrideCellState( 2, 0, LifeState::ALIVE);
+	//lifeBoard.overrideCellState( 0, 0, LifeState::ALIVE);
+	//lifeBoard.overrideCellState( 1, 0, LifeState::ALIVE);
+	//lifeBoard.overrideCellState( 2, 0, LifeState::ALIVE);
 
-	//world.overrideCellState(0, 1, LifeState::ALIVE);
-	//world.overrideCellState(2, 1, LifeState::ALIVE);
+	//lifeBoard.overrideCellState(0, 1, LifeState::ALIVE);
+	//lifeBoard.overrideCellState(2, 1, LifeState::ALIVE);
 
-	//world.overrideCellState( 0, 2, LifeState::ALIVE);
-	//world.overrideCellState( 1, 2, LifeState::ALIVE);
-	//world.overrideCellState( 2, 2, LifeState::ALIVE);
+	//lifeBoard.overrideCellState( 0, 2, LifeState::ALIVE);
+	//lifeBoard.overrideCellState( 1, 2, LifeState::ALIVE);
+	//lifeBoard.overrideCellState( 2, 2, LifeState::ALIVE);
 
-	//world.overrideCellState(10, 10, LifeState::ALIVE);
-	//world.overrideCellState(10, 11, LifeState::ALIVE);
-	//world.overrideCellState(11, 10, LifeState::ALIVE);
-	//world.overrideCellState(11, 11, LifeState::ALIVE);
+	//lifeBoard.overrideCellState(10, 10, LifeState::ALIVE);
+	//lifeBoard.overrideCellState(10, 11, LifeState::ALIVE);
+	//lifeBoard.overrideCellState(11, 10, LifeState::ALIVE);
+	//lifeBoard.overrideCellState(11, 11, LifeState::ALIVE);
 
-	//world.overrideCellState(16, 2, LifeState::ALIVE);
-	//world.overrideCellState(16, 3, LifeState::ALIVE);
-	//world.overrideCellState(16, 4, LifeState::ALIVE);
+	//lifeBoard.overrideCellState(16, 2, LifeState::ALIVE);
+	//lifeBoard.overrideCellState(16, 3, LifeState::ALIVE);
+	//lifeBoard.overrideCellState(16, 4, LifeState::ALIVE);
 
-	//world.saveCurState(bbSave1);
+	//lifeBoard.saveCurState(bbSave1);
 
 	
 
 	simStateOverlay.setSize(sf::Vector2f(200, 200));
 
-	world.setBoardOutline(sf::Color::Cyan, 0.01 * window.getSize().y);
-	world.setGridOverlay(true);
+	lifeBoard.setBoardOutline(sf::Color::Cyan, 0.01 * window.getSize().y);
+	lifeBoard.setGridOverlay(true);
 
 
 	simStateOverlay.snapTo(sf::Vector2f(0,720), Orientation::TopLeft);
@@ -128,6 +141,9 @@ int main()
 	{
 		// make sure view is reset to camera view
 		camera.updateView();
+
+		// make sure flags are unset
+		ProgramEvent.SetAllFlagsFalse();
 
 		sf::Event event;
 		while (window.pollEvent(event))
@@ -167,8 +183,7 @@ int main()
 			{
 				if (event.key.code == sf::Keyboard::C)
 				{
-					camera.centerOn(world.getGlobalBounds(), 0.05);
-					world.setBoardOutline(sf::Color::Cyan, 0.01 * window.getSize().y);
+					ProgramEvent.SetFlag(InputEvent::CenterOn);
 				}
 				else if (event.key.code == sf::Keyboard::Space)
 				{
@@ -204,21 +219,9 @@ int main()
 				}
 				// Handle click to add/remove tile type
 				// only activate if not dragging
-				else if (!camera.isDraggingActive() && event.mouseButton.button == bindings.selectButton 
-					&& world.pixelOnBoard(window.mapPixelToCoords( sf::Mouse::getPosition(window) )))
+				else if (event.mouseButton.button == bindings.selectButton)
 				{
-					// get cell info
-					sf::Vector2i targetCell = world.pixelToCellIndex(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
-
-					switch (world.getCellState(targetCell.x, targetCell.y))
-					{
-					case LifeState::ALIVE:
-						world.overrideCellState(targetCell.x, targetCell.y, LifeState::DEAD);
-						break;
-					case LifeState::DEAD:
-						world.overrideCellState(targetCell.x, targetCell.y, LifeState::ALIVE);
-						break;
-					}
+					ProgramEvent.SetFlag(InputEvent::LMBClick);
 				}
 			}
 			else if (event.type == sf::Event::MouseButtonReleased)
@@ -310,14 +313,37 @@ int main()
 		if (ProgramEvent.HasFlag(InputEvent::SaveData))
 		{
 			// save the current array for reloading
-			world.saveCurState(bbSave1);
+			lifeBoard.saveCurState(bbSave1);
 			std::cout << "save updated" << std::endl;
 		}
 		if (ProgramEvent.HasFlag(InputEvent::LoadSaveData))
 		{
 			// reload save state
 			std::cout << "loading save 1" << std::endl;
-			world.loadCurState(bbSave1);
+			lifeBoard.loadCurState(bbSave1);
+		}
+		if (ProgramEvent.HasFlag(InputEvent::CenterOn))
+		{
+			// center on board
+			camera.centerOn(lifeBoard.getGlobalBounds(), 0.05);
+			lifeBoard.setBoardOutline(sf::Color::Cyan, 0.01 * window.getSize().y);
+		}
+		// check if mouseclick should flip the cell's state, but only if click + not currently dragging + cursor is on the board
+		if (ProgramEvent.HasMultiFlag(InputEvent::LMBClick) && !camera.isDraggingActive() 
+			&& lifeBoard.pixelOnBoard(window.mapPixelToCoords(sf::Mouse::getPosition(window))))
+		{
+			// click happens and the drag is not active, thus flip cell state
+			// get cell info
+			sf::Vector2i targetCell = lifeBoard.pixelToCellIndex(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
+
+			switch (lifeBoard.getCellState(targetCell.x, targetCell.y))
+			{
+			case LifeState::ALIVE:
+				lifeBoard.overrideCellState(targetCell.x, targetCell.y, LifeState::DEAD);
+				break;
+			case LifeState::DEAD:
+				lifeBoard.overrideCellState(targetCell.x, targetCell.y, LifeState::ALIVE);
+				break;
 		}
 
 		// drag events
@@ -350,7 +376,7 @@ int main()
 
 				//				TICK BLOCK
 				// =======================================
-				CGOL::solveConwayStep(world, cwaySettings);
+				CGOL::solveConwayStep(lifeBoard, cwaySettings);
 				//cout << "step processed" << endl;
 			}
 
@@ -368,7 +394,7 @@ int main()
 		window.clear();
 
 
-		world.refresh();
+		lifeBoard.refresh();
 
 
 
@@ -381,7 +407,7 @@ int main()
 		// ===============================================
 		camera.updateView();
 		//window.draw(shape);
-		world.draw(window);
+		lifeBoard.draw(window);
 		
 
 
