@@ -401,6 +401,16 @@ public:
 		this->mFlagState = 0;
 	}
 
+	/* mFunction Name: Are all Flags False
+	* Description: returns true if all flags are false, otherwise, returns true
+	* Inputs: none
+	* Outputs: true if all flags are false, true otherwise
+	*/
+	inline bool allFlagsFalse()
+	{
+		return this->mFlagState == 0;
+	}
+
 private:
 	uint32_t mFlagState = 0;	// data the flags are actually stored in
 };

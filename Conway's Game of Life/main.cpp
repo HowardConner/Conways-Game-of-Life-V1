@@ -27,15 +27,15 @@ enum class InputEvent
 	ZoomOut			= 1 << 5,
 	CenterOn		= 1 << 6,
 	DragStarted		= 1 << 7,
-	DragActive		= 1 << 8,		// likely redunduant by using "CursorMovment"
+	//DragActive		= 1 << 8,		// likely redunduant by using "CursorMovment"
 	DragEnded		= 1 << 9,
 	SaveData		= 1 << 10,
 	LoadSaveData	= 1 << 11,
 	CursorMovement	= 1 << 12,
 	RMBClick		= 1 << 13,
 	LMBClick		= 1 << 14,
-	//Flag16= 1 << 15,
-	//Flag17= 1 << 16,
+	PauseSim	= 1 << 15,
+	RunSimulation	= 1 << 16,
 	//Flag18= 1 << 17,
 	//Flag19= 1 << 18,
 	//Flag20= 1 << 19,
@@ -56,6 +56,9 @@ struct ProgramBindings {
 	sf::Keyboard::Key moveLeft = sf::Keyboard::A;
 	sf::Keyboard::Key moveRight = sf::Keyboard::D;
 	sf::Keyboard::Key saveKey = sf::Keyboard::Num1;
+	sf::Keyboard::Key centerKey = sf::Keyboard::C;
+	sf::Keyboard::Key toggleSimKey = sf::Keyboard::Space;
+	sf::Keyboard::Key reloadKey = sf::Keyboard::R;
 
 	sf::Keyboard::Key zoomIn = sf::Keyboard::PageUp;
 	sf::Keyboard::Key zoomOut = sf::Keyboard::PageDown;
@@ -73,8 +76,8 @@ int main()
 	// define program characteristics
 	sf::Vector2f screenDim(1280, 720);
 	ProgramBindings bindings;
-	bool pauseSim = true;
-	int ticksPerSecond = 15;
+	bool runSim = false;
+	int ticksPerSecond = 10;
 	float secondsPerTick = 1.0 / ticksPerSecond;
 
 	// define program resources
@@ -85,23 +88,30 @@ int main()
 	sf::Vector2f simStateScreenPercent(0.1, 0.1);
 	sf::Image tempImage;
 	Flag_32<InputEvent> ProgramEvent;
+	sf::Vector2i mousePos;
 
 	sf::Texture simActiveTexture;
-	tempImage.create(200, 200, sf::Color::Green);
-	simActiveTexture.loadFromImage(tempImage);
+	tempImage.create(200, 200, sf::Color::Blue);
+	if (!simActiveTexture.loadFromImage(tempImage))
+	{
+		std::cout << "Failed to create [simActiveTexture] texture" << std::endl;
+	}
 
 	sf::Texture simPausedTexture;
 	tempImage.create(200, 200, sf::Color::Red);
-	simActiveTexture.loadFromImage(tempImage);
+	if(!simActiveTexture.loadFromImage(tempImage))
+	{
+		std::cout << "Failed to create [simaPausedTexture] texture" << std::endl;
+	}
 
-	RectDisplay simStateOverlay;
-	simStateOverlay.setTexture(&simActiveTexture);
+	RectDisplay simStateOverlay(sf::Vector2f(20,10));
+
 
 	BoolBoardSaveState bbSave1;
 
 	CameraController camera(window, 0.025);
-	CameraController hud(window, 0.025);
-	BoolBoard lifeBoard(64, 64, 50);
+	CameraController hud(window, 0.000025);
+	BoolBoard lifeBoard(32, 16, 50);
 	ConwaySettings cwaySettings;
 
 	//lifeBoard.overrideCellState( 0, 0, LifeState::ALIVE);
@@ -128,15 +138,22 @@ int main()
 
 	
 
-	simStateOverlay.setSize(sf::Vector2f(200, 200));
+	
 
 	lifeBoard.setBoardOutline(sf::Color::Cyan, 0.01 * window.getSize().y);
 	lifeBoard.setGridOverlay(true);
 
 
-	simStateOverlay.snapTo(sf::Vector2f(0,720), Orientation::TopLeft);
+	//simStateOverlay.snapTo(sf::Vector2f(0,720), Orientation::BottomLeft);
+	simStateOverlay.setSize(sf::Vector2f(100, 50));
+	simStateOverlay.snapTo(hud.getCamRectangle(), Orientation::TopRight);
+	simStateOverlay.setTexture(&simPausedTexture);
+
+	camera.centerOn(lifeBoard.getGlobalBounds(), 0.05);
+
 	clock.restart();
 
+	
 	while (window.isOpen())
 	{
 		// make sure view is reset to camera view
@@ -145,19 +162,27 @@ int main()
 		// make sure flags are unset
 		ProgramEvent.SetAllFlagsFalse();
 
+		// get mouse position
+		mousePos = sf::Mouse::getPosition(window);
+
+		// ===============================================
+		//				Key Pressed events
+		// ===============================================
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
-			// Handle Prgram close
-			if (event.type == sf::Event::Closed )
+			switch (event.type)
+			{
+			// ===============================================
+			//				Window Close event
+			// ===============================================
+			case sf::Event::Closed:
 				window.close();
-
+				break;
 			// ===============================================
 			//				Key Pressed events
 			// ===============================================
-			if (event.type == sf::Event::KeyPressed)
-			{
-				// handle program close
+			case sf::Event::KeyPressed:
 				if (event.key.code == sf::Keyboard::Escape)
 				{
 					window.close();
@@ -174,84 +199,78 @@ int main()
 				{
 					ProgramEvent.SetFlag(InputEvent::SaveData);
 				}
-
-			}
-			// ===============================================
-			//				Key Released Events
-			// ===============================================
-			if (event.type == sf::Event::KeyReleased)
-			{
-				if (event.key.code == sf::Keyboard::C)
-				{
-					ProgramEvent.SetFlag(InputEvent::CenterOn);
-				}
-				else if (event.key.code == sf::Keyboard::Space)
-				{
-					if (pauseSim == false)
-					{
-						// sim active, pause it
-						pauseSim = true;
-						simStateOverlay.setTexture(&simPausedTexture);
-					}
-					else
-					{
-						// sim is paused, reengage it
-						pauseSim = false;
-						simStateOverlay.setTexture(&simActiveTexture);
-						deltaTime = secondsPerTick;
-						// reset the clock
-						clock.restart();
-					}
-				}
-				else if (event.key.code == sf::Keyboard::R)
+				else if (event.key.code == bindings.reloadKey)
 				{
 					ProgramEvent.SetFlag(InputEvent::LoadSaveData);
 				}
-			}
+				break;
 			// ===============================================
-			//				Mouse Click Events
+			//				Key Released Events
 			// ===============================================
-			if (event.type == sf::Event::MouseButtonPressed)
-			{
+			case sf::Event::KeyReleased:
+				if (event.key.code == bindings.centerKey)
+				{
+					ProgramEvent.SetFlag(InputEvent::CenterOn);
+				}
+				else if (event.key.code == bindings.toggleSimKey && runSim == false)
+				{
+					ProgramEvent.SetFlag(InputEvent::RunSimulation);
+				}
+				else if (event.key.code == bindings.toggleSimKey && runSim == true)
+				{
+					ProgramEvent.SetFlag(InputEvent::PauseSim);
+				}
+				break;
+			// ===============================================
+			//			Mouse Button Pressed Events
+			// ===============================================
+			case sf::Event::MouseButtonPressed:
 				if (event.mouseButton.button == bindings.dragButton)
 				{
 					ProgramEvent.SetFlag(InputEvent::DragStarted);
 				}
-				// Handle click to add/remove tile type
-				// only activate if not dragging
 				else if (event.mouseButton.button == bindings.selectButton)
 				{
 					ProgramEvent.SetFlag(InputEvent::LMBClick);
 				}
-			}
-			else if (event.type == sf::Event::MouseButtonReleased)
-			{
-				// release drag if correct button released
-				if (event.key.code == event.mouseButton.button)
+				break;
+			// ===============================================
+			//			Mouse Buttone Released Events
+			// ===============================================
+			case sf::Event::MouseButtonReleased:
+				if (event.mouseButton.button == bindings.dragButton)
 				{
-					// unbind drag
 					ProgramEvent.SetFlag(InputEvent::DragEnded);
 				}
-			}
-			else if (event.type == sf::Event::MouseMoved)
-			{
-				// check if drag is active
-				ProgramEvent.SetFlag(InputEvent::CursorMovement);
-			}
-			else if (event.type == sf::Event::MouseWheelScrolled)
-			{
-				// check zoom in
-				if (event.mouseWheelScroll.delta > 0)
+				break;
+			// ===============================================
+			//				Moused Move Events
+			// ===============================================
+			case sf::Event::MouseMoved:
+				if(camera.isDraggingActive())
 				{
-					
+					ProgramEvent.SetFlag(InputEvent::CursorMovement);
 				}
-				else if (event.mouseWheelScroll.delta < 0)
+				break;
+			// ===============================================
+			//			Mouse Wheel Scrolled Events
+			// ===============================================
+			case sf::Event::MouseWheelScrolled:
+				if (!camera.isDraggingActive() && event.mouseWheelScroll.delta > 0)
 				{
-					
+					ProgramEvent.SetFlag(InputEvent::ZoomIn);
 				}
+				else if (!camera.isDraggingActive() && event.mouseWheelScroll.delta < 0)
+				{
+					ProgramEvent.SetFlag(InputEvent::ZoomOut);
+				}
+				break;
+			//default:
+			//	break;
 			}
 
 		}
+
 
 
 		// ===============================================
@@ -280,92 +299,114 @@ int main()
 		// ==============================================================================================
 		//										Process Event Flags
 		// ==============================================================================================
-		if (ProgramEvent.HasFlag(InputEvent::MoveUp))
+		// only process if an event was recorded
+		if(!ProgramEvent.allFlagsFalse())
 		{
-			// Move Main Camera Upwards
-			camera.move(CamDirection::UP, movementAmount);
-		}
-		if (ProgramEvent.HasFlag(InputEvent::MoveDown))
-		{
-			// Move Main Camera Downwards
-			camera.move(CamDirection::DOWN, movementAmount);
-		}
-		if (ProgramEvent.HasFlag(InputEvent::MoveLeft))
-		{
-			// Move Main Camera Left
-			camera.move(CamDirection::LEFT, movementAmount);
-		}
-		if (ProgramEvent.HasFlag(InputEvent::MoveRight))
-		{
-			// Move Main Camera Right 
-			camera.move(CamDirection::RIGHT, movementAmount);
-		}
-		if (ProgramEvent.HasFlag(InputEvent::ZoomIn))
-		{
-			// scroll up, zoom out
-			camera.zoom(zoomAmount);
-		}
-		if (ProgramEvent.HasFlag(InputEvent::ZoomOut))
-		{
-			// scroll down, zoom in
-			camera.zoom( -1 * zoomAmount);
-		}
-		if (ProgramEvent.HasFlag(InputEvent::SaveData))
-		{
-			// save the current array for reloading
-			lifeBoard.saveCurState(bbSave1);
-			std::cout << "save updated" << std::endl;
-		}
-		if (ProgramEvent.HasFlag(InputEvent::LoadSaveData))
-		{
-			// reload save state
-			std::cout << "loading save 1" << std::endl;
-			lifeBoard.loadCurState(bbSave1);
-		}
-		if (ProgramEvent.HasFlag(InputEvent::CenterOn))
-		{
-			// center on board
-			camera.centerOn(lifeBoard.getGlobalBounds(), 0.05);
-			lifeBoard.setBoardOutline(sf::Color::Cyan, 0.01 * window.getSize().y);
-		}
-		// check if mouseclick should flip the cell's state, but only if click + not currently dragging + cursor is on the board
-		if (ProgramEvent.HasMultiFlag(InputEvent::LMBClick) && !camera.isDraggingActive() 
-			&& lifeBoard.pixelOnBoard(window.mapPixelToCoords(sf::Mouse::getPosition(window))))
-		{
-			// click happens and the drag is not active, thus flip cell state
-			// get cell info
-			sf::Vector2i targetCell = lifeBoard.pixelToCellIndex(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
-
-			switch (lifeBoard.getCellState(targetCell.x, targetCell.y))
+			if (ProgramEvent.HasFlag(InputEvent::MoveUp))
 			{
-			case LifeState::ALIVE:
-				lifeBoard.overrideCellState(targetCell.x, targetCell.y, LifeState::DEAD);
-				break;
-			case LifeState::DEAD:
-				lifeBoard.overrideCellState(targetCell.x, targetCell.y, LifeState::ALIVE);
-				break;
-		}
+				// Move Main Camera Upwards
+				camera.move(CamDirection::UP, movementAmount);
+			}
+			if (ProgramEvent.HasFlag(InputEvent::MoveDown))
+			{
+				// Move Main Camera Downwards
+				camera.move(CamDirection::DOWN, movementAmount);
+			}
+			if (ProgramEvent.HasFlag(InputEvent::MoveLeft))
+			{
+				// Move Main Camera Left
+				camera.move(CamDirection::LEFT, movementAmount);
+			}
+			if (ProgramEvent.HasFlag(InputEvent::MoveRight))
+			{
+				// Move Main Camera Right 
+				camera.move(CamDirection::RIGHT, movementAmount);
+			}
+			if (ProgramEvent.HasFlag(InputEvent::ZoomIn))
+			{
+				// scroll up, zoom out
+				camera.zoom(zoomAmount);
+			}
+			else if (ProgramEvent.HasFlag(InputEvent::ZoomOut))
+			{
+				// scroll down, zoom in
+				camera.zoom(-1 * zoomAmount);
+			}
 
-		// drag events
-		if (ProgramEvent.HasFlag(InputEvent::DragStarted) && !camera.isDraggingActive())
-		{
-			camera.startDragEvent(window);
-		}
-		else if (ProgramEvent.HasFlag(InputEvent::DragEnded) && camera.isDraggingActive())
-		{
-			camera.finishDragEvent();
-		}
-		else if (ProgramEvent.HasFlag(InputEvent::CursorMovement) && camera.isDraggingActive())
-		{
-			camera.handleDragEvent();
-		}
+			if (ProgramEvent.HasFlag(InputEvent::SaveData))
+			{
+				// save the current array for reloading
+				lifeBoard.saveCurState(bbSave1);
+				std::cout << "save updated" << std::endl;
+			}
+			else if (ProgramEvent.HasFlag(InputEvent::LoadSaveData))
+			{
+				// reload save state
+				std::cout << "loading save 1" << std::endl;
+				lifeBoard.loadCurState(bbSave1);
+			}
 
+			if (ProgramEvent.HasFlag(InputEvent::CenterOn))
+			{
+				// center on board
+				camera.centerOn(lifeBoard.getGlobalBounds(), 0.05);
+				lifeBoard.setBoardOutline(sf::Color::Cyan, 0.01 * window.getSize().y);
+			}
+			// check if mouseclick should flip the cell's state, but only if click + not currently dragging + cursor is on the board
+			if (ProgramEvent.HasFlag(InputEvent::LMBClick) && !camera.isDraggingActive()
+				&& lifeBoard.pixelOnBoard(window.mapPixelToCoords(mousePos)))//sf::Mouse::getPosition(window)
+			{
+				// click happens and the drag is not active, thus flip cell state
+				// get cell info
+				sf::Vector2i targetCell = lifeBoard.pixelToCellIndex(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
+
+				switch (lifeBoard.getCellState(targetCell.x, targetCell.y))
+				{
+				case LifeState::ALIVE:
+					lifeBoard.overrideCellState(targetCell.x, targetCell.y, LifeState::DEAD);
+					break;
+				case LifeState::DEAD:
+					lifeBoard.overrideCellState(targetCell.x, targetCell.y, LifeState::ALIVE);
+					break;
+				}
+			}
+			// drag events
+			if (ProgramEvent.HasFlag(InputEvent::DragStarted) && !camera.isDraggingActive())
+			{
+				camera.startDragEvent(window);
+			}
+			else if (ProgramEvent.HasFlag(InputEvent::DragEnded) && camera.isDraggingActive())
+			{
+				camera.finishDragEvent();
+			}
+			else if (ProgramEvent.HasFlag(InputEvent::CursorMovement) && camera.isDraggingActive())
+			{
+				camera.handleDragEvent();
+			}
+
+			// process pause/play sim
+			if (ProgramEvent.HasFlag(InputEvent::RunSimulation))
+			{
+				// sim is paused, reengage it
+				runSim = true;
+				simStateOverlay.setTexture(&simActiveTexture);
+				deltaTime = secondsPerTick;
+				// reset the clock
+				clock.restart();
+			}
+			else if (ProgramEvent.HasFlag(InputEvent::PauseSim))
+			{
+				// sim active, pause it
+				runSim = false;
+				simStateOverlay.setTexture(&simPausedTexture);
+			}
+		}
 
 
 		// ===============================================
 		//			Tick Event Block
 		// ===============================================
-		if (pauseSim != true)
+		if (runSim == true)
 		{
 			deltaTime += clock.getElapsedTime().asSeconds();
 
@@ -386,20 +427,13 @@ int main()
 
 
 
-
-
 		// ===============================================
 		//		  Refresh Block
 		// ===============================================
 		window.clear();
 
-
 		lifeBoard.refresh();
 
-
-
-
-		
 
 
 		// ===============================================
@@ -408,7 +442,7 @@ int main()
 		camera.updateView();
 		//window.draw(shape);
 		lifeBoard.draw(window);
-		
+
 
 
 		// ===============================================

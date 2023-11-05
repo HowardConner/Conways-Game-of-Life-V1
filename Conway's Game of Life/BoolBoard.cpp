@@ -405,8 +405,8 @@ sf::Vector2i BoolBoard::pixelToCellIndex(const sf::Vector2f& pixelPoint) const
 	result.y = static_cast<int>((pixelPoint.y - this->mCellArrRect.getPosition().y) / this->mTileSize);
 
 	// display result for verification
-	std::cout << "point (" << pixelPoint.x << ", " << pixelPoint.y << ") corresponds to index [" << \
-		result.x << ", " << result.y << "]\n" << std::endl;
+	/*std::cout << "point (" << pixelPoint.x << ", " << pixelPoint.y << ") corresponds to index [" << \
+		result.x << ", " << result.y << "]\n" << std::endl;*/
 
 	return result;
 }
