@@ -12,6 +12,7 @@
 #include "BoolBoard.hpp"
 #include "ConwaySolver.hpp"
 #include "RectDisplay.hpp"
+#include "TickClock.hpp"
 #include "Game-Engine/Component Classes/Object_Flags.hpp"
 
 const float movementAmount = 0.10;
@@ -96,8 +97,8 @@ int main()
 	sf::Vector2f screenDim(1280, 720);
 	ProgramBindings bindings;
 	bool runSim = false;
-	int ticksPerSecond = 10;
-	float secondsPerTick = 1.0 / ticksPerSecond;
+	unsigned ticksPerSecond = 10;
+	TickClock globalTickTimer(ticksPerSecond);
 
 	// define program resources
 	sf::Clock clock;
@@ -299,7 +300,6 @@ int main()
 				// sim is paused, reengage it
 				runSim = true;
 				simStateOverlay.setTexture(&simActiveTexture);
-				deltaTime = secondsPerTick;
 				// reset the clock
 				clock.restart();
 			}
@@ -315,23 +315,17 @@ int main()
 		// ===============================================
 		//			Tick Event Block
 		// ===============================================
-		if (runSim == true)
+		// check for tick clock update and process as long as there is one
+		while (globalTickTimer.update())
 		{
-			deltaTime += clock.getElapsedTime().asSeconds();
-
-			if (deltaTime >= secondsPerTick)
+			// a tick pulse has been activated, thus, begin processing events
+			if (runSim == true)
 			{
-				// "reset" delta time
-				deltaTime = deltaTime - secondsPerTick;
-
 				//				TICK BLOCK
 				// =======================================
 				CGOL::solveConwayStep(lifeBoard, cwaySettings);
 				//cout << "step processed" << endl;
 			}
-
-			// reset the clock
-			clock.restart();
 		}
 
 

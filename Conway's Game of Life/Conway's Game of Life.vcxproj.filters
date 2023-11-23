@@ -149,5 +149,8 @@
     <ClInclude Include="HeadsUpDisplay.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TickClock.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
