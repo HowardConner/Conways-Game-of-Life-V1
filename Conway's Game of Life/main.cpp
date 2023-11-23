@@ -29,15 +29,15 @@ enum class InputEvent
 	DragStarted		= 1 << 7,
 	//DragActive		= 1 << 8,		// likely redunduant by using "CursorMovment"
 	DragEnded		= 1 << 9,
-	SaveData		= 1 << 10,
+	//		= 1 << 10,
 	LoadSaveData	= 1 << 11,
 	CursorMovement	= 1 << 12,
 	RMBClick		= 1 << 13,
 	LMBClick		= 1 << 14,
-	PauseSim	= 1 << 15,
+	PauseSim		= 1 << 15,
 	RunSimulation	= 1 << 16,
-	//Flag18= 1 << 17,
-	//Flag19= 1 << 18,
+	ClearBoard		= 1 << 17,
+	SaveData		= 1 << 18,
 	//Flag20= 1 << 19,
 	//Flag21= 1 << 20,
 	//Flag22= 1 << 21,
@@ -68,12 +68,31 @@ struct ProgramBindings {
 	sf::Mouse::Button selectButton = sf::Mouse::Button::Left;
 };
 
+/* mFunction Name: Check Event Queue Input
+* Description: Assesses the state of the event queue and unqueues all event inputs.
+* Upgrade Ideas: create generic pass through for non-flag input signals to be processed from
+* Inputs: window to poll from, masterFlag list to be outputed to
+* Outputs: masterFlag list to be outputed to
+*/
+void checkEventQueueInputs(sf::RenderWindow& window, Flag_32<InputEvent>& masterFlag, bool runSim, const ProgramBindings& bindings, 
+	const CameraController& activeCamera);
+
+/* mFunction Name: Direct Input Flag Checker
+* Description: Sets flags in the MasterFlag list based upon direct input, that is,
+*	it does not use the event queue but polls the keys/mouse/joystick directly
+* Inputs: window to reference, masterFlag list to be outputed to
+* Outputs: masterFlag list to be outputed to
+*/
+void checkDirectInputs(sf::RenderWindow& window, Flag_32<InputEvent>& masterFlag, const ProgramBindings& bindings, 
+	const CameraController& activeCamera);
+
 int main()
 {
 	// Define Variables
 	string appTitle = "Conway's Game of Life";
 
 	// define program characteristics
+	sf::ContextSettings winContextSettings(0U, 0U, 0U);
 	sf::Vector2f screenDim(1280, 720);
 	ProgramBindings bindings;
 	bool runSim = false;
@@ -83,7 +102,7 @@ int main()
 	// define program resources
 	sf::Clock clock;
 	float deltaTime = 0.0;
-	sf::RenderWindow window(sf::VideoMode(screenDim.x, screenDim.y), appTitle);
+	sf::RenderWindow window(sf::VideoMode(screenDim.x, screenDim.y), appTitle, 7U, winContextSettings);
 	sf::RectangleShape shape(sf::Vector2f(100, 100));
 	sf::Vector2f simStateScreenPercent(0.1, 0.1);
 	sf::Image tempImage;
@@ -91,7 +110,7 @@ int main()
 	sf::Vector2i mousePos;
 
 	sf::Texture simActiveTexture;
-	tempImage.create(200, 200, sf::Color::Blue);
+	tempImage.create(200, 200, sf::Color::Green);
 	if (!simActiveTexture.loadFromImage(tempImage))
 	{
 		std::cout << "Failed to create [simActiveTexture] texture" << std::endl;
@@ -99,20 +118,22 @@ int main()
 
 	sf::Texture simPausedTexture;
 	tempImage.create(200, 200, sf::Color::Red);
-	if(!simActiveTexture.loadFromImage(tempImage))
+	if(!simPausedTexture.loadFromImage(tempImage))
 	{
 		std::cout << "Failed to create [simaPausedTexture] texture" << std::endl;
 	}
 
 	RectDisplay simStateOverlay(sf::Vector2f(20,10));
 
-
+	BoolBoardSaveState bbSaveNull;
 	BoolBoardSaveState bbSave1;
 
 	CameraController camera(window, 0.025);
 	CameraController hud(window, 0.000025);
 	BoolBoard lifeBoard(32, 16, 50);
 	ConwaySettings cwaySettings;
+
+	lifeBoard.saveCurState(bbSaveNull);
 
 	//lifeBoard.overrideCellState( 0, 0, LifeState::ALIVE);
 	//lifeBoard.overrideCellState( 1, 0, LifeState::ALIVE);
@@ -168,131 +189,13 @@ int main()
 		// ===============================================
 		//				Key Pressed events
 		// ===============================================
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			switch (event.type)
-			{
-			// ===============================================
-			//				Window Close event
-			// ===============================================
-			case sf::Event::Closed:
-				window.close();
-				break;
-			// ===============================================
-			//				Key Pressed events
-			// ===============================================
-			case sf::Event::KeyPressed:
-				if (event.key.code == sf::Keyboard::Escape)
-				{
-					window.close();
-				}
-				else if (event.key.code == bindings.zoomIn)
-				{
-					ProgramEvent.SetFlag(InputEvent::ZoomIn);
-				}
-				else if (event.key.code == bindings.zoomOut)
-				{
-					ProgramEvent.SetFlag(InputEvent::ZoomOut);
-				}
-				else if (event.key.code == bindings.saveKey)
-				{
-					ProgramEvent.SetFlag(InputEvent::SaveData);
-				}
-				else if (event.key.code == bindings.reloadKey)
-				{
-					ProgramEvent.SetFlag(InputEvent::LoadSaveData);
-				}
-				break;
-			// ===============================================
-			//				Key Released Events
-			// ===============================================
-			case sf::Event::KeyReleased:
-				if (event.key.code == bindings.centerKey)
-				{
-					ProgramEvent.SetFlag(InputEvent::CenterOn);
-				}
-				else if (event.key.code == bindings.toggleSimKey && runSim == false)
-				{
-					ProgramEvent.SetFlag(InputEvent::RunSimulation);
-				}
-				else if (event.key.code == bindings.toggleSimKey && runSim == true)
-				{
-					ProgramEvent.SetFlag(InputEvent::PauseSim);
-				}
-				break;
-			// ===============================================
-			//			Mouse Button Pressed Events
-			// ===============================================
-			case sf::Event::MouseButtonPressed:
-				if (event.mouseButton.button == bindings.dragButton)
-				{
-					ProgramEvent.SetFlag(InputEvent::DragStarted);
-				}
-				else if (event.mouseButton.button == bindings.selectButton)
-				{
-					ProgramEvent.SetFlag(InputEvent::LMBClick);
-				}
-				break;
-			// ===============================================
-			//			Mouse Buttone Released Events
-			// ===============================================
-			case sf::Event::MouseButtonReleased:
-				if (event.mouseButton.button == bindings.dragButton)
-				{
-					ProgramEvent.SetFlag(InputEvent::DragEnded);
-				}
-				break;
-			// ===============================================
-			//				Moused Move Events
-			// ===============================================
-			case sf::Event::MouseMoved:
-				if(camera.isDraggingActive())
-				{
-					ProgramEvent.SetFlag(InputEvent::CursorMovement);
-				}
-				break;
-			// ===============================================
-			//			Mouse Wheel Scrolled Events
-			// ===============================================
-			case sf::Event::MouseWheelScrolled:
-				if (!camera.isDraggingActive() && event.mouseWheelScroll.delta > 0)
-				{
-					ProgramEvent.SetFlag(InputEvent::ZoomIn);
-				}
-				else if (!camera.isDraggingActive() && event.mouseWheelScroll.delta < 0)
-				{
-					ProgramEvent.SetFlag(InputEvent::ZoomOut);
-				}
-				break;
-			//default:
-			//	break;
-			}
-
-		}
-
+		checkEventQueueInputs(window, ProgramEvent, runSim, bindings, camera);
 
 
 		// ===============================================
 		//			Handle Instantaneous Inputs
 		// ===============================================
-		if (sf::Keyboard::isKeyPressed(bindings.moveUp))
-		{
-			ProgramEvent.SetFlag(InputEvent::MoveUp);
-		}
-		if (sf::Keyboard::isKeyPressed(bindings.moveDown))
-		{
-			ProgramEvent.SetFlag(InputEvent::MoveDown);
-		}
-		if (sf::Keyboard::isKeyPressed(bindings.moveLeft))
-		{
-			ProgramEvent.SetFlag(InputEvent::MoveLeft);
-		}
-		if (sf::Keyboard::isKeyPressed(bindings.moveRight))
-		{
-			ProgramEvent.SetFlag(InputEvent::MoveRight);
-		}
-
+		checkDirectInputs(window, ProgramEvent, bindings, camera);
 
 
 
@@ -338,6 +241,12 @@ int main()
 				// save the current array for reloading
 				lifeBoard.saveCurState(bbSave1);
 				std::cout << "save updated" << std::endl;
+			}
+			else if (ProgramEvent.HasFlag(InputEvent::ClearBoard))
+			{
+				// load null data plot
+				std::cout << "Wiping Board Clear" << std::endl;
+				lifeBoard.loadCurState(bbSaveNull);
 			}
 			else if (ProgramEvent.HasFlag(InputEvent::LoadSaveData))
 			{
@@ -458,4 +367,149 @@ int main()
 	}
 
 	return 0;
+}
+
+
+/* mFunction Name: Check Event Queue Input
+* Description: Assesses the state of the event queue and unqueues all event inputs.
+* Upgrade Ideas: create generic pass through for non-flag input signals to be processed from
+* Inputs: window to poll from, masterFlag list to be outputed to
+* Outputs: masterFlag list to be outputed to
+*/
+void checkEventQueueInputs(sf::RenderWindow& window, Flag_32<InputEvent>& masterFlag, bool runSim, const ProgramBindings& bindings,
+	const CameraController& activeCamera)
+{
+	sf::Event event;
+	while (window.pollEvent(event))
+	{
+		switch (event.type)
+		{
+			// ===============================================
+			//				Window Close event
+			// ===============================================
+		case sf::Event::Closed:
+			window.close();
+			break;
+			// ===============================================
+			//				Key Pressed events
+			// ===============================================
+		case sf::Event::KeyPressed:
+			if (event.key.code == sf::Keyboard::Escape)
+			{
+				window.close();
+			}
+			else if (event.key.code == bindings.zoomIn)
+			{
+				masterFlag.SetFlag(InputEvent::ZoomIn);
+			}
+			else if (event.key.code == bindings.zoomOut)
+			{
+				masterFlag.SetFlag(InputEvent::ZoomOut);
+			}
+			else if (event.key.code == bindings.saveKey)
+			{
+				masterFlag.SetFlag(InputEvent::SaveData);
+			}
+			else if (event.key.code == sf::Keyboard::Key::Num0)
+			{
+				masterFlag.SetFlag(InputEvent::ClearBoard);
+			}
+			else if (event.key.code == bindings.reloadKey)
+			{
+				masterFlag.SetFlag(InputEvent::LoadSaveData);
+			}
+			break;
+			// ===============================================
+			//				Key Released Events
+			// ===============================================
+		case sf::Event::KeyReleased:
+			if (event.key.code == bindings.centerKey)
+			{
+				masterFlag.SetFlag(InputEvent::CenterOn);
+			}
+			else if (event.key.code == bindings.toggleSimKey && runSim == false)
+			{
+				masterFlag.SetFlag(InputEvent::RunSimulation);
+			}
+			else if (event.key.code == bindings.toggleSimKey && runSim == true)
+			{
+				masterFlag.SetFlag(InputEvent::PauseSim);
+			}
+			break;
+			// ===============================================
+			//			Mouse Button Pressed Events
+			// ===============================================
+		case sf::Event::MouseButtonPressed:
+			if (event.mouseButton.button == bindings.dragButton)
+			{
+				masterFlag.SetFlag(InputEvent::DragStarted);
+			}
+			else if (event.mouseButton.button == bindings.selectButton)
+			{
+				masterFlag.SetFlag(InputEvent::LMBClick);
+			}
+			break;
+			// ===============================================
+			//			Mouse Buttone Released Events
+			// ===============================================
+		case sf::Event::MouseButtonReleased:
+			if (event.mouseButton.button == bindings.dragButton)
+			{
+				masterFlag.SetFlag(InputEvent::DragEnded);
+			}
+			break;
+			// ===============================================
+			//				Moused Move Events
+			// ===============================================
+		case sf::Event::MouseMoved:
+			if (activeCamera.isDraggingActive())
+			{
+				masterFlag.SetFlag(InputEvent::CursorMovement);
+			}
+			break;
+			// ===============================================
+			//			Mouse Wheel Scrolled Events
+			// ===============================================
+		case sf::Event::MouseWheelScrolled:
+			if (!activeCamera.isDraggingActive() && event.mouseWheelScroll.delta > 0)
+			{
+				masterFlag.SetFlag(InputEvent::ZoomIn);
+			}
+			else if (!activeCamera.isDraggingActive() && event.mouseWheelScroll.delta < 0)
+			{
+				masterFlag.SetFlag(InputEvent::ZoomOut);
+			}
+			break;
+			//default:
+			//	break;
+		}
+
+	}
+}
+
+/* mFunction Name: Direct Input Flag Checker
+* Description: Sets flags in the MasterFlag list based upon direct input, that is,
+*	it does not use the event queue but polls the keys/mouse/joystick directly
+* Inputs: window to reference, masterFlag list to be outputed to
+* Outputs: masterFlag list to be outputed to
+*/
+void checkDirectInputs(sf::RenderWindow& window, Flag_32<InputEvent>& masterFlag, const ProgramBindings& bindings,
+	const CameraController& activeCamera)
+{
+	if (sf::Keyboard::isKeyPressed(bindings.moveUp))
+	{
+		masterFlag.SetFlag(InputEvent::MoveUp);
+	}
+	if (sf::Keyboard::isKeyPressed(bindings.moveDown))
+	{
+		masterFlag.SetFlag(InputEvent::MoveDown);
+	}
+	if (sf::Keyboard::isKeyPressed(bindings.moveLeft))
+	{
+		masterFlag.SetFlag(InputEvent::MoveLeft);
+	}
+	if (sf::Keyboard::isKeyPressed(bindings.moveRight))
+	{
+		masterFlag.SetFlag(InputEvent::MoveRight);
+	}
 }
