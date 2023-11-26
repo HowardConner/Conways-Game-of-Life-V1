@@ -7,21 +7,16 @@
 *	the scene to the user. It has move commands
 ******************************************************************************
 *************/
-#ifndef VIRTUAL_CAMERA_INTERFACE_HPP
-#define VIRTUAL_CAMERA_INTERFACE_HPP
+#ifndef VIRTUAL_STATIC_CAMERA_INTERFACE_HPP
+#define VIRTUAL_STATIC_CAMERA_INTERFACE_HPP
 
 #include <iostream>
 
 #include "SFML/Graphics.hpp"
 #include "vUpdateInterface.hpp"
-#include "../Experimental/CenterOnFunctions.hpp"
 
-enum CamDirection
-{
-	UP, DOWN, LEFT, RIGHT
-};
 
-class CameraInterface
+class StaticCameraInterface
 {
 public:
 	// offset rectangle that contains offset variables for different directions
@@ -39,17 +34,17 @@ public:
 	// --------------------------------------------------------------------------------------------- //
 	// constructor
 	// requires an opened render window to pair with. Uses for size information
-	CameraInterface(sf::RenderWindow& displayWindow, const float& velocityPercentOfScreenPerStep = 0.005);
+	StaticCameraInterface(sf::RenderWindow& displayWindow);
 
 	// destructor
-	virtual ~CameraInterface();
+	virtual ~StaticCameraInterface();
 
 	// --------------------------------------------------------------------------------------------- //
 	//									Setters and Getters
 	// --------------------------------------------------------------------------------------------- //
 	// setters
 	// Velocity percent is 100% = 1.0f. Velocity is a magnitude, thus always positive.
-	void setVeloctiy(const float& percentScreenPerStep = 1.f);
+	//void setVeloctiy(const float& percentScreenPerStep = 1.f);
 
 	// getters
 	const sf::View& getView() const;
@@ -71,9 +66,9 @@ public:
 	* Description: Moves the camera in the relative direction indicated by the orientation and by
 	*	the percent velocity (1 = 100% nominal velcity)
 	* Inputs: orientation and percent nominal velocity
-	* Outputs: 
+	* Outputs:
 	*/
-	 void move(const CamDirection& orientation, const float& percentVelocity = 1.0);
+	//void move(const CamDirection& orientation, const float& percentVelocity = 1.0);
 
 	/* mFunction Name: Move Camera
 	* Description: Moves the camera by scaling the integer number of pixels in the Window to match in view
@@ -81,14 +76,14 @@ public:
 	* Inputs: vector of mouse int delta and percent nominal velocity
 	* Outputs:
 	*/
-	 void move(sf::Vector2i& windowDelta);
+	//void move(sf::Vector2i& windowDelta);
 
 	/* mFunction Name: Resize Viewport from Window update
 	* Description: Uses the event parameters to resize the internal viewport and updates the output panel
 	* Inputs:
 	* Outputs:
 	*/
-	void resizeView(const sf::Event::SizeEvent eventSize);
+	//void resizeView(const sf::Event::SizeEvent eventSize);
 
 	/* mFunction Name: Resize Viewport for new Resolution
 	* Description: designates a new resolution/ aspect ratio for the camera
@@ -98,7 +93,7 @@ public:
 	void resizeView(const float& width, const float& height);
 
 	/* mFunction Name: Zoom Window
-	* Description: Zooms the display screen by the scaling factor. Treat as percent 
+	* Description: Zooms the display screen by the scaling factor. Treat as percent
 	*	zoom where 100 is 100% zoom out and -100 is -100% zoom in
 	* Inputs: Multiplier to zoom, 0 being no zooming, positive amount zoom out,
 	*	and negative amount zoom out
@@ -159,7 +154,7 @@ public:
 	*	Useful for:
 	*		converting mouse input in window to relative window global coordinates
 	* Inputs: Coordinate Relative to window
-	* Preconditions: 
+	* Preconditions:
 	* Outputs: Coordinate in view corresponding to where it is relative to window
 	* Returns: Coordinate in view corresponding to where it is relative to window
 	* Postconditions:
@@ -167,16 +162,13 @@ public:
 	inline sf::Vector2f convertWindowToView(const sf::Vector2i& coordInWindow);
 
 
-
-
-
 protected:
 	//float mAspectRatio;
 	sf::Vector2f mResolution;
 	sf::Vector2f mOffset;
-	sf::Vector2f mVelocity;			// velocity of moving
-	float mVelocityScreenPercent;	// velocity function as percent of screen dims/step
-	float moveModifier = 0.05;
+	//sf::Vector2f mVelocity;			// velocity of moving
+	//float mVelocityScreenPercent;	// velocity function as percent of screen dims/step
+	//float moveModifier = 0.05;
 	bool mNeedUpdate = true;
 	sf::View mCamView;
 	sf::RenderWindow& mBoundWindow;	// current open window that this controller interacts with
@@ -191,7 +183,7 @@ protected:
 	* Inputs: none
 	* Outputs: none
 	*/
-	void updateVelocity();
+	//void updateVelocity();
 
 
 
