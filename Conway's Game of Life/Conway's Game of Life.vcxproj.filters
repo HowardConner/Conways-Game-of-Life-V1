@@ -63,6 +63,21 @@
     <ClCompile Include="Game-Engine\InputHandler\InputOverloader.cpp">
       <Filter>Source Files\Engine Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="StaticCameraController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Game-Engine\Interface Classes\vStaticCameraInterface.cpp">
+      <Filter>Source Files\Engine Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Game-Engine\Experimental\CenterOnFunctions.cpp">
+      <Filter>Source Files\Engine Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HeadsUpDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game-Engine\Interface Classes\vInputInterface.hpp">
@@ -151,6 +166,18 @@
     </ClInclude>
     <ClInclude Include="TickClock.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Button.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticCameraController.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\Interface Classes\vStaticCameraInterface.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
+    </ClInclude>
+    <ClInclude Include="Game-Engine\Experimental\CenterOnFunctions.hpp">
+      <Filter>Header Files\Game Engine Refs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

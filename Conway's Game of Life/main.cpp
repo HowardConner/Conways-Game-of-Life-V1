@@ -15,30 +15,32 @@
 #include "TickClock.hpp"
 #include "Game-Engine/Component Classes/Object_Flags.hpp"
 
+#include "Game-Engine/Renderer/RenderEngine.hpp"
+
 const float movementAmount = 0.10;
 const float zoomAmount = 20.0;
 
 enum class InputEvent
 {
-	MoveUp			= 1 << 0,
-	MoveDown		= 1 << 1,
-	MoveLeft		= 1 << 2,
-	MoveRight		= 1 << 3,
-	ZoomIn			= 1 << 4,
-	ZoomOut			= 1 << 5,
-	CenterOn		= 1 << 6,
-	DragStarted		= 1 << 7,
-	//DragActive		= 1 << 8,		// likely redunduant by using "CursorMovment"
+	CloseProgram	= 1 << 0, 
+	MoveUp			= 1 << 1,
+	MoveDown		= 1 << 2,
+	MoveLeft		= 1 << 3,
+	MoveRight		= 1 << 4,
+	ZoomIn			= 1 << 5,
+	ZoomOut			= 1 << 6,
+	CenterOn		= 1 << 7,
+	DragStarted		= 1 << 8,
 	DragEnded		= 1 << 9,
-	//		= 1 << 10,
-	LoadSaveData	= 1 << 11,
-	CursorMovement	= 1 << 12,
-	RMBClick		= 1 << 13,
-	LMBClick		= 1 << 14,
-	PauseSim		= 1 << 15,
-	RunSimulation	= 1 << 16,
-	ClearBoard		= 1 << 17,
-	SaveData		= 1 << 18,
+	LoadSaveData	= 1 << 10,
+	CursorMovement	= 1 << 11,
+	RMBClick		= 1 << 12,
+	LMBClick		= 1 << 13,
+	PauseSim		= 1 << 14,
+	RunSimulation	= 1 << 15,
+	ClearBoard		= 1 << 16,
+	SaveData		= 1 << 17,
+	//Flag19= 1 << 18,
 	//Flag20= 1 << 19,
 	//Flag21= 1 << 20,
 	//Flag22= 1 << 21,
@@ -49,6 +51,10 @@ enum class InputEvent
 	//Flag27= 1 << 26,
 	//Flag28= 1 << 27,
 	//Flag29= 1 << 28,
+	//Flag30= 1 << 29,
+	//Flag31= 1 << 30,
+	//Flag32= 1 << 31,
+	INPUT_COUNT			//the amount of flags active in the Enum list
 };
 
 struct ProgramBindings {
@@ -65,7 +71,7 @@ struct ProgramBindings {
 	sf::Keyboard::Key zoomOut = sf::Keyboard::PageDown;
 
 	// drag funcitonality
-	sf::Mouse::Button dragButton = sf::Mouse::Button::Middle;
+	sf::Mouse::Button dragButton = sf::Mouse::Button::Right;
 	sf::Mouse::Button selectButton = sf::Mouse::Button::Left;
 };
 
@@ -135,33 +141,7 @@ int main()
 	ConwaySettings cwaySettings;
 
 	lifeBoard.saveCurState(bbSaveNull);
-
-	//lifeBoard.overrideCellState( 0, 0, LifeState::ALIVE);
-	//lifeBoard.overrideCellState( 1, 0, LifeState::ALIVE);
-	//lifeBoard.overrideCellState( 2, 0, LifeState::ALIVE);
-
-	//lifeBoard.overrideCellState(0, 1, LifeState::ALIVE);
-	//lifeBoard.overrideCellState(2, 1, LifeState::ALIVE);
-
-	//lifeBoard.overrideCellState( 0, 2, LifeState::ALIVE);
-	//lifeBoard.overrideCellState( 1, 2, LifeState::ALIVE);
-	//lifeBoard.overrideCellState( 2, 2, LifeState::ALIVE);
-
-	//lifeBoard.overrideCellState(10, 10, LifeState::ALIVE);
-	//lifeBoard.overrideCellState(10, 11, LifeState::ALIVE);
-	//lifeBoard.overrideCellState(11, 10, LifeState::ALIVE);
-	//lifeBoard.overrideCellState(11, 11, LifeState::ALIVE);
-
-	//lifeBoard.overrideCellState(16, 2, LifeState::ALIVE);
-	//lifeBoard.overrideCellState(16, 3, LifeState::ALIVE);
-	//lifeBoard.overrideCellState(16, 4, LifeState::ALIVE);
-
-	//lifeBoard.saveCurState(bbSave1);
-
 	
-
-	
-
 	lifeBoard.setBoardOutline(sf::Color::Cyan, 0.01 * window.getSize().y);
 	lifeBoard.setGridOverlay(true);
 
@@ -182,7 +162,7 @@ int main()
 		camera.updateView();
 
 		// make sure flags are unset
-		ProgramEvent.SetAllFlagsFalse();
+		
 
 		// get mouse position
 		mousePos = sf::Mouse::getPosition(window);
@@ -326,6 +306,10 @@ int main()
 				CGOL::solveConwayStep(lifeBoard, cwaySettings);
 				//cout << "step processed" << endl;
 			}
+
+
+
+
 		}
 
 

@@ -10,40 +10,30 @@
 #define CAMERA_CONTROLLER_HPP
 
 #include "Game-Engine/Interface Classes/vCameraInterface.hpp"
-//#include "Game-Engine/Interface Classes/vEventInterface.hpp"
-//#include "Game-Engine/Interface Classes/vInputInterface.hpp"
 #include "Game-Engine/Interface Classes/vDragInterface.hpp"
-#include "Game-Engine/Component Classes/Object_Attributes.hpp"
-#include "Game-Engine/Renderer/RenderEngine.hpp"
 
-
-class CameraController : public CameraInterface, public DragInterface//, public InputInterface, public EventInterface
+class StaticCameraController : public CameraInterface, DragInterface//, public InputInterface, public EventInterface
 {
 public:
 	// --------------------------------------------------------------------------------------------- //
 	//				Constructors, Default Constructors, Copy Constructors, Destructors
 	// --------------------------------------------------------------------------------------------- //
 	// constructor
-	CameraController(sf::RenderWindow& displayWindow, const float& velocityPercentOfScreenPerStep = 0.025);
+	StaticCameraController(sf::RenderWindow& displayWindow);
 
 	// destructor
-	~CameraController();
+	~StaticCameraController();
 
 
 	// --------------------------------------------------------------------------------------------- //
 	//									Setters and Getters
 	// --------------------------------------------------------------------------------------------- //
 	// setters
-	// set Camera_ID.
-	//	Requires render engine object in order to verify that user has permission to change the ID
-	Att::camera_ID setID(const RenderEngine& rendererObject, const Att::camera_ID& newCamID);
 
-	// Getters
-	// get camera_ID
-	Att::camera_ID getID() const;
+
+	// getters
 	// Returns the location and size (in camView-relative pixels) as floatRect
 	sf::FloatRect getCamRectangle() const;
-
 	// check dragging active event
 	//  returns true if active, false otherwise
 	inline bool isDraggingActive() const;
@@ -76,7 +66,7 @@ public:
 	void setCameraBounds(const sf::FloatRect& area, const float& perecentOffset = 0.0);
 
 	/* mFunction Name: Restrict (or Unrestrict) Camera bounds
-	* Description: Either sets or unsets the flag for restricting camera movement outside of 
+	* Description: Either sets or unsets the flag for restricting camera movement outside of
 	*	the bounds of the Bound locking area. Auto snaps the camera back to a valid view location
 	* Inputs: state to set to, true for restrict, false to unlock
 	* Outputs: returns true if change made, false otherwise
@@ -93,7 +83,6 @@ public:
 
 private:
 	//cameraKeyBindings mBindings;	// key bindings for the camera class
-	Att::camera_ID mCamID = Att::NULL_CAMERA_ID;
 	bool mEnforceCamBounds;			// flag before enforcing area
 	sf::FloatRect mCamBounds;		// boundary area for locking movement
 
@@ -111,7 +100,7 @@ private:
 
 
 	/* mFunction Name: Enforce Bounds
-	* Description: Enforces bound shift area by making sure (if possible) to shift and centers the 
+	* Description: Enforces bound shift area by making sure (if possible) to shift and centers the
 	*	shape if possible
 	* Inputs: none
 	* Outputs: returns true if change made, false if not

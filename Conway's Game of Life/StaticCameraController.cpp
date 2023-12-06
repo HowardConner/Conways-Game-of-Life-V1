@@ -6,22 +6,22 @@
 * Description:
 ******************************************************************************
 *************/
-#include "CameraController.hpp"
+#include "StaticCameraController.hpp"
 
 
 // --------------------------------------------------------------------------------------------- //
 //				Constructors, Default Constructors, Copy Constructors, Destructors
 // --------------------------------------------------------------------------------------------- //
 // constructor
-CameraController::CameraController(sf::RenderWindow& displayWindow, const float& velocityPercentOfScreenPerStep) :
-	CameraInterface(displayWindow, velocityPercentOfScreenPerStep),
+StaticCameraController::StaticCameraController(sf::RenderWindow& displayWindow) :
+	CameraInterface(displayWindow),
 	DragInterface()			//InputInterface(), EventInterface()
 {
 
 }
 
 // destructor
-CameraController::~CameraController()
+StaticCameraController::~StaticCameraController()
 {
 	// destructors handled automatically
 }
@@ -32,32 +32,20 @@ CameraController::~CameraController()
 //									Setters and Getters
 // --------------------------------------------------------------------------------------------- //
 // Setters
-// set Camera_ID.
-//	Requires render engine object in order to verify that user has permission to change the ID
-Att::camera_ID CameraController::setID(const RenderEngine& rendererObject, const Att::camera_ID& newCamID)
-{
-	return this->mCamID = newCamID;
-}
-
 
 
 // getters
-// get camera_ID
-Att::camera_ID CameraController::getID() const
-{
-	return this->mCamID;
-}
 // Returns the location and size (in camView-relative pixels) as floatRect
-sf::FloatRect CameraController::getCamRectangle() const
+sf::FloatRect StaticCameraController::getCamRectangle() const
 {
 	return sf::FloatRect(this->mCamView.getCenter().x - 0.5 * mCamView.getSize().x,
-						this->mCamView.getCenter().y - 0.5 * mCamView.getSize().y,
-						mCamView.getSize().x,
-						mCamView.getSize().y);
+		this->mCamView.getCenter().y - 0.5 * mCamView.getSize().y,
+		mCamView.getSize().x,
+		mCamView.getSize().y);
 }
 
 //  returns true if active, false otherwise
-bool CameraController::isDraggingActive() const
+bool StaticCameraController::isDraggingActive() const
 {
 	return DragInterface::isDraggingActive();
 }
@@ -72,7 +60,7 @@ bool CameraController::isDraggingActive() const
 ////* Inputs: Constant Reference to event to handle
 ////* Outputs: returns true if an event was handled, false otherwise
 ////*/
-////bool CameraController::handleEvent(const sf::Event& eventToHandle)
+////bool StaticCameraController::handleEvent(const sf::Event& eventToHandle)
 ////{
 ////	// define variables
 ////	bool result = false;
@@ -149,7 +137,7 @@ bool CameraController::isDraggingActive() const
 //* Inputs: accepts none
 //* Outputs: returns true if an event was handled, false otherwise
 //*/
-//bool CameraController::handleInput()
+//bool StaticCameraController::handleInput()
 //{
 //	// define variables
 //	float moveAmount = 0.10;
@@ -186,7 +174,7 @@ bool CameraController::isDraggingActive() const
 * Inputs: FloatRect of the area to move, percentOffset from that area
 * Outputs: none
 */
-void CameraController::setCameraBounds(const sf::FloatRect& area, const float& percentOffset)
+void StaticCameraController::setCameraBounds(const sf::FloatRect& area, const float& percentOffset)
 {
 	// make sure to incorperate percent offset
 	this->mCamBounds = sf::FloatRect(area.left * (1 - percentOffset), area.top * (1 - percentOffset),
@@ -199,7 +187,7 @@ void CameraController::setCameraBounds(const sf::FloatRect& area, const float& p
 * Inputs: state to set to, true for restrict, false to unlock
 * Outputs: returns true if change made, false otherwise
 */
-bool CameraController::restrictCameraBounds(const bool& toState)
+bool StaticCameraController::restrictCameraBounds(const bool& toState)
 {
 	// if attempting to restrict, make sure its not already restricted
 	if (toState == true && true != this->mEnforceCamBounds)
@@ -227,7 +215,7 @@ bool CameraController::restrictCameraBounds(const bool& toState)
 * Inputs: Current Mouse Move Event, open window
 * Outputs: none
 */
-void CameraController::handleDragEvent()
+void StaticCameraController::handleDragEvent()
 {
 	// define variables
 	sf::Vector2i mousePos = sf::Mouse::getPosition(this->mBoundWindow);
@@ -252,7 +240,7 @@ void CameraController::handleDragEvent()
 * Inputs: none
 * Outputs: returns true if change made, false if not
 */
-bool CameraController::enforceBounds()
+bool StaticCameraController::enforceBounds()
 {
 	// define variables
 	sf::Vector2f curCenter(getCamRectangle().left + 0.5 * getCamRectangle().width,
@@ -272,7 +260,7 @@ bool CameraController::enforceBounds()
 
 	}
 
-	
+
 
 
 

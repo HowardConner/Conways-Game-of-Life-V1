@@ -139,22 +139,28 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BoolBoard.cpp" />
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="commentTemplate.cpp" />
     <ClCompile Include="commentTemplateAttribute.cpp" />
     <ClCompile Include="commentTemplateClass.cpp" />
     <ClCompile Include="ConwaySolver.cpp" />
     <ClCompile Include="Game-Engine\Debug Functions\DataLogReport.cpp" />
+    <ClCompile Include="Game-Engine\Experimental\CenterOnFunctions.cpp" />
     <ClCompile Include="Game-Engine\InputHandler\InputController.cpp" />
     <ClCompile Include="Game-Engine\InputHandler\InputOverloader.cpp" />
     <ClCompile Include="Game-Engine\Interface Classes\vCameraInterface.cpp" />
     <ClCompile Include="Game-Engine\Interface Classes\vDragInterface.cpp" />
+    <ClCompile Include="Game-Engine\Interface Classes\vStaticCameraInterface.cpp" />
     <ClCompile Include="Game-Engine\Renderer\RenderEngine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RectDisplay.cpp" />
+    <ClCompile Include="StaticCameraController.cpp" />
+    <ClCompile Include="HeadsUpDisplay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoolBoard.hpp" />
+    <ClInclude Include="Button.hpp" />
     <ClInclude Include="CameraController.hpp" />
     <ClInclude Include="Cell.hpp" />
     <ClInclude Include="ConwaySettings.hpp" />
@@ -165,6 +171,7 @@
     <ClInclude Include="Game-Engine\Data Structures\Array_Grid.hpp" />
     <ClInclude Include="Game-Engine\Debug Functions\DataLogReport.hpp" />
     <ClInclude Include="Game-Engine\Debug Functions\PrintColors.h" />
+    <ClInclude Include="Game-Engine\Experimental\CenterOnFunctions.hpp" />
     <ClInclude Include="Game-Engine\GameEngine.hpp" />
     <ClInclude Include="Game-Engine\InputHandler\InputController.hpp" />
     <ClInclude Include="Game-Engine\InputHandler\InputOverloader.hpp" />
@@ -173,6 +180,7 @@
     <ClInclude Include="Game-Engine\Interface Classes\vDrawableInterface.hpp" />
     <ClInclude Include="Game-Engine\Interface Classes\vEventInterface.hpp" />
     <ClInclude Include="Game-Engine\Interface Classes\vInputInterface.hpp" />
+    <ClInclude Include="Game-Engine\Interface Classes\vStaticCameraInterface.hpp" />
     <ClInclude Include="Game-Engine\Interface Classes\vUpdateInterface.hpp" />
     <ClInclude Include="Game-Engine\Renderer\RenderEngine.hpp" />
     <ClInclude Include="Game-Engine\Renderer\RenderObject.hpp" />
@@ -180,6 +188,7 @@
     <ClInclude Include="IntesectionFunctions.hpp" />
     <ClInclude Include="MasterHeader.hpp" />
     <ClInclude Include="RectDisplay.hpp" />
+    <ClInclude Include="StaticCameraController.hpp" />
     <ClInclude Include="TickClock.hpp" />
     <ClInclude Include="Vector_Grid.hpp" />
     <ClInclude Include="vUpdateInterface.hpp" />

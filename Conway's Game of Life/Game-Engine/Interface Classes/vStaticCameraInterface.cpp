@@ -44,7 +44,14 @@ sf::FloatRect StaticCameraInterface::getViewBox() const
 	return this->mCamView.getViewport();
 }
 
-
+// Returns the location and size (in camView-relative pixels) as floatRect
+sf::FloatRect StaticCameraInterface::getCamRectangle() const
+{
+	return sf::FloatRect(this->mCamView.getCenter().x - 0.5 * mCamView.getSize().x,
+		this->mCamView.getCenter().y - 0.5 * mCamView.getSize().y,
+		mCamView.getSize().x,
+		mCamView.getSize().y);
+}
 
 
 

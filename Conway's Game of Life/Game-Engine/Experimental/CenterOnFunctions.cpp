@@ -34,8 +34,8 @@ funct::ViewInfo funct::centerViewOn(const sf::Vector2f & Resolution, const sf::F
 		ratioY = offsetHeight / Resolution.y;
 
 	// set a default value for the frame center (easy part)
-	newViewInfo.center = { frameToCenterOn.left + 0.5 * frameToCenterOn.width,
-		frameToCenterOn.top + 0.5 * frameToCenterOn.height };
+	newViewInfo.center = sf::Vector2f( frameToCenterOn.left + 0.5 * frameToCenterOn.width,
+		frameToCenterOn.top + 0.5 * frameToCenterOn.height );
 	// Frame size unknown, finish below calcs for correct size
 	//newViewInfo.size = { 0, 0 };
 

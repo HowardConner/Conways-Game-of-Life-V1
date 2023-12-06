@@ -124,7 +124,7 @@ public:
 	void draw(sf::RenderWindow& window) const;
 
 private:
-	size_t mActiveTexture = 0;
+	size_t mActiveTexture = 0;	// index of the currently active texture
 	sf::RectangleShape mShape;
 	std::vector<sf::Texture> mTextureList;
 	// --------------------------------------------------------------------------------------------- //

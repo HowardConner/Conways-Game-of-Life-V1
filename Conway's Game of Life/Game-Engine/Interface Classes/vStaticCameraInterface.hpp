@@ -49,7 +49,8 @@ public:
 	// getters
 	const sf::View& getView() const;
 	sf::FloatRect getViewBox() const;
-
+	// Returns the location and size (in camView-relative pixels) as floatRect
+	sf::FloatRect getCamRectangle() const;
 
 
 	// --------------------------------------------------------------------------------------------- //

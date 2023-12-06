@@ -16,6 +16,7 @@
 #include "vUpdateInterface.hpp"
 #include "../Experimental/CenterOnFunctions.hpp"
 
+
 enum CamDirection
 {
 	UP, DOWN, LEFT, RIGHT
@@ -165,7 +166,6 @@ public:
 	* Postconditions:
 	*/
 	inline sf::Vector2f convertWindowToView(const sf::Vector2i& coordInWindow);
-
 
 
 
